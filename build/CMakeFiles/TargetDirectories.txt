@@ -1,0 +1,4 @@
+/home/ananth/Desktop/CS 3281f22/assignment-8-ananthjj/build/CMakeFiles/rebuild_cache.dir
+/home/ananth/Desktop/CS 3281f22/assignment-8-ananthjj/build/CMakeFiles/edit_cache.dir
+/home/ananth/Desktop/CS 3281f22/assignment-8-ananthjj/build/CMakeFiles/test.dir
+/home/ananth/Desktop/CS 3281f22/assignment-8-ananthjj/build/CMakeFiles/shell.dir

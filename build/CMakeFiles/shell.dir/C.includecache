@@ -1,0 +1,24 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/ananth/Desktop/CS 3281f22/assignment-8-ananthjj/shell.c
+shell.h
+/home/ananth/Desktop/CS 3281f22/assignment-8-ananthjj/shell.h
+stdio.h
+-
+stdlib.h
+-
+sys/types.h
+-
+sys/wait.h
+-
+unistd.h
+-
+
+/home/ananth/Desktop/CS 3281f22/assignment-8-ananthjj/shell.h
+

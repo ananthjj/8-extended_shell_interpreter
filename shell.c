@@ -43,8 +43,59 @@ void execute2(char* const args1[], char* const args2[])
         printf(" %s", args1[i]);
     printf(" (%d words)\n", i);
 
+    if (args1[0] == NULL) {
+        printf("*** Empty command\n");
+        return;
+    }
+
+    int prev_pipe, pfds[2];
+
+    prev_pipe = STDIN_FILENO;
+
+    pipe(pfds);
+    pid_t pid = fork();
+
+    if (pid == 0) {
+      // Redirect previous pipe to stdin
+      if (prev_pipe != STDIN_FILENO) {
+	dup2(prev_pipe, STDIN_FILENO);
+	close(prev_pipe);
+      }
+      
+      // Redirect stdout to current pipe
+      dup2(pfds[1], STDOUT_FILENO);
+      close(pfds[1]);
+      
+      // Start command
+      execvp(args1[0], args1);
+      
+      perror("execvp failed");
+      exit(1);
+    }
+
+    // Close read end of previous pipe (not needed in the parent)
+    close(prev_pipe);
+    
+    // Close write end of current pipe (not needed in the parent)
+    close(pfds[1]);
+    
+    // Save read end of current pipe to use in next iteration
+    prev_pipe = pfds[0];
+
+    // Start last command
     printf("*** Second command:");
     for (i = 0; args2[i] != NULL; i++)
         printf(" %s", args2[i]);
     printf(" (%d words)\n", i);
+    
+    // Get stdin from last pipe
+    if (prev_pipe != STDIN_FILENO) {
+      dup2(prev_pipe, STDIN_FILENO);
+      close(prev_pipe);
+    }
+    
+    execvp(args2[0], args2);
+    
+    perror("execvp failed");
+    exit(1);   
 }
