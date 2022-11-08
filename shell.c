@@ -79,7 +79,6 @@ void execute2(char* const args1[], char* const args2[])
       pid_t pid2 = fork();
 
       if (pid2 == 0){
-	// Close write end of current pipe (not needed in the parent)
 	close(pfds[1]);
 
 	// Start last command
