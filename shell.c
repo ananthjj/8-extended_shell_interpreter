@@ -48,14 +48,13 @@ void execute2(char* const args1[], char* const args2[])
         return;
     }
 
-    int /*prev_pipe,*/ pfds[2];
-
-    //prev_pipe = STDIN_FILENO;
+    int pfds[2];
 
     pipe(pfds);
-    pid_t pid = fork();
+    pid_t pid1 = fork();
+     
 
-    if (pid == 0){
+    if (pid1 == 0){
       close(pfds[0]);
       
       // Redirect stdout to current pipe
@@ -66,39 +65,59 @@ void execute2(char* const args1[], char* const args2[])
       // Start command
       execvp(args1[0], args1);
       
-      perror("execvp failed");
+      printf("*** Command not found: %s\n", args1[0]);
       exit(1);
     }
-    else if (pid > 0){
+    else if (pid1 > 0){
       int status = 0;
-      waitpid(pid, &status, 0);
+      waitpid(pid1, &status, 0);
       if (WEXITSTATUS(status) == 0)
 	printf("*** Child exited sucessfully\n");
       else
 	printf("*** Child exited with %d\n", WEXITSTATUS(status));
-
-      // Close write end of current pipe (not needed in the parent)
-      close(pfds[1]);
-
-      // Start last command
-      printf("*** Second command:");
-      for (i = 0; args2[i] != NULL; i++)
-        printf(" %s", args2[i]);
-      printf(" (%d words)\n", i);
       
-      // Get stdin from last pipe
-      dup2(pfds[0], STDIN_FILENO);
-      close(pfds[0]);
+      pid_t pid2 = fork();
+
+      if (pid2 == 0){
+	// Close write end of current pipe (not needed in the parent)
+	close(pfds[1]);
+
+	// Start last command
+	printf("*** Second command:");
+	for (i = 0; args2[i] != NULL; i++)
+	  printf(" %s", args2[i]);
+	printf(" (%d words)\n", i);
+
+	if (args2[0] == NULL) {
+        printf("*** Empty command\n");
+        return;
+	}
+
+	// Get stdin from last pipe
+	dup2(pfds[0], STDIN_FILENO);
+	close(pfds[0]);
    
-      execvp(args2[0], args2);
+	execvp(args2[0], args2);
     
-      perror("execvp failed");
-      
-      //exit(1);
+	printf("*** Command not found: %s\n", args2[0]);
+	exit(1);
+      }
+      else if (pid2 > 0){
+	close(pfds[0]);
+	close(pfds[1]);
+
+	int status = 0;
+	waitpid(pid2, &status, 0);
+	if (WEXITSTATUS(status) == 0)
+	  printf("*** Child exited sucessfully\n");
+	else
+	  printf("*** Child exited with %d\n", WEXITSTATUS(status));
+      }
+      else
+	printf("*** Fork failed\n");
     }
-    else{
+    else
       printf("*** Fork failed\n");
-    }
 }
 
 /*void executeN(char* const args[]){
