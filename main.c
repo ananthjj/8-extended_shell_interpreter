@@ -57,11 +57,33 @@ int main(int argc, char* argv[])
         char* line2 = strtok(NULL, "|");
         if (line2 == NULL) {
             execute1(argv1);
-        } else {
-            char* argv2[MAX_WORDS];
-            make_words(line2, argv2);
-            execute2(argv1, argv2);
         }
+
+	else{
+	  int i = 2;
+	  char* argv2[MAX_WORDS];
+	  make_words(line2, argv2);
+	  char* line3 = strtok(NULL, "|");
+	  if (line3 == NULL)
+	    execute2(argv1, argv2);
+	  else{
+	    char* argvN [MC][MAX_WORDS];
+	    for(int j = 0; argv1[j]!=NULL; j++)
+	      argvN[0][j] = argv1[j];
+	    for(int k = 0; argv2[k]!=NULL; k++)
+	      argvN[1][k] = argv2[k];
+	    
+	    do{
+	      make_words(line3, argvN[i++]);
+	      line3 = strtok(NULL, "|");
+	    }while(line3 != NULL);
+
+	    executeN(argvN, i);
+	  }
+
+        }
+
+	
     }
     printf("*** Closing the CS3281 Shell\n");
 
